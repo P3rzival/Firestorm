@@ -19,11 +19,12 @@ import numpy as np
 
 def transition_func(grid, neighbourstates, neighbourcounts, decaygrid):
     # dead = state == 0, live = state == 1
-	# Chaparraol = state == 0, forest = state == 1, canyon = state == 2, lake = state == 3, town = state == 4
+	# Chaparral = state == 0, forest = state == 1, canyon = state == 2, lake = state == 3, town = state == 4
     # unpack state counts for state 0 and state 1
     cells_in_state_5 = (grid == 5)
-    decaygrid[cells_in_state_5] -= 1
-    decayed_to_zero = (decaygrid == 0)
+    decaygrid[cells_in_state_5] += 2
+	
+    decayed_to_zero = (decaygrid >= 6)
     grid[decayed_to_zero] = 6
 
     dead_neighbours = neighbourcounts[5] #on fire neighbour count
@@ -39,9 +40,9 @@ def transition_func(grid, neighbourstates, neighbourcounts, decaygrid):
 	
     chaparralFire = (dead_neighbours >= 2) & (grid !=3) & (grid != 6)
 	
-    forestFire = (dead_neighbours >= 3) & (grid == 1)
+    #forestFire = (dead_neighbours >= 3) & (grid == 1)
 	
-    canyonFire = (dead_neighbours >= 1) & (grid ==2)
+    #canyonFire = (dead_neighbours >= 1) & (grid ==2)
 	
     # if 2 or 3 live neighbours and is alive -> survives
     survive = ((live_neighbours == 2) | (live_neighbours == 3)) & (grid == 1)
@@ -51,7 +52,11 @@ def transition_func(grid, neighbourstates, neighbourcounts, decaygrid):
 	
     # Set cells to 1 where either cell is born or survives
     #grid[birth | survive] = 1
-    grid[chaparralFire | forestFire | canyonFire] = 5
+    decaygrid[chaparralFire] -= 1
+	
+    decayed_to_zero2 = (decaygrid == 0)
+    grid[decayed_to_zero2] = 5
+  
     return grid
 
 

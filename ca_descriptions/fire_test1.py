@@ -21,42 +21,51 @@ def transition_func(grid, neighbourstates, neighbourcounts, decaygrid):
     # dead = state == 0, live = state == 1
 	# Chaparral = state == 0, forest = state == 1, canyon = state == 2, lake = state == 3, town = state == 4
     # unpack state counts for state 0 and state 1
+
+    chapFireThreshold = 0.4
+    canFireThreshold = 0.4
+    forFireThreshold = 0.6
+    #SET TO BURNT OUT
     cells_in_state_5 = (grid == 5)
     decaygrid[cells_in_state_5] += 2
-	
+
     decayed_to_zero = (decaygrid >= 6)
     grid[decayed_to_zero] = 6
 
     dead_neighbours = neighbourcounts[5] #on fire neighbour count
     live_neighbours = 8 - dead_neighbours #not on fire neighbour count
     #dead_neighbours, live_neighbours = neighbourcounts
-    
+
     # create boolean arrays for the birth & survival rules
-	
+
     # if 3 live neighbours and is dead -> cell born
-    birth = (live_neighbours == 3) & (grid == 0)
-	
+    #birth = (live_neighbours == 3) & (grid == 0)
+
     #fire = (dead_neighbours >= 2) & (grid != 3)
-	
+
     chaparralFire = (dead_neighbours >= 2) & (grid !=3) & (grid != 6)
-	
+
     #forestFire = (dead_neighbours >= 3) & (grid == 1)
-	
+
     #canyonFire = (dead_neighbours >= 1) & (grid ==2)
-	
+    #chaparralNow = (grid == 0) +
+
+    #chaparralFire = (chaparralNow >= chapFireThreshold)
     # if 2 or 3 live neighbours and is alive -> survives
-    survive = ((live_neighbours == 2) | (live_neighbours == 3)) & (grid == 1)
-	
+    #survive = ((live_neighbours == 2) | (live_neighbours == 3)) & (grid == 1)
+
     """# Set all cells to 0 (dead)
     grid[:, :] = 5"""
-	
+
     # Set cells to 1 where either cell is born or survives
     #grid[birth | survive] = 1
+
+    #SET TO BURNING
     decaygrid[chaparralFire] -= 1
-	
+
     decayed_to_zero2 = (decaygrid == 0)
     grid[decayed_to_zero2] = 5
-  
+
     return grid
 
 
@@ -83,18 +92,18 @@ def setup(args):
     config.initial_grid[waterl:waterl+8, waterr:waterr+18] = 3
     config.initial_grid[canl:canl+60, canr:canr+6] = 2
     config.initial_grid[townl:townl+2, townr:townr+6] = 4
-    
+
 	#incinerator
     config.initial_grid[0,99] = 5
     config.initial_grid[1,99] = 5
-	
+
 	#powerplant
     #config.initial_grid[0,0] = 5
     #config.initial_grid[1,0] = 5
-	
-	
+
+
     # ----------------------------------------------------------------------
-	
+
     if len(args) == 2:
         config.save()
         sys.exit()
@@ -107,22 +116,22 @@ def main():
     config = setup(sys.argv[1:])
 
     # Create grid object
-    #decaygrid = np.zeros(config.grid_dims)
-    #decaygrid.fill(2)
+    decaygrid = np.zeros(config.grid_dims)
+    decaygrid.fill(2)
     #create intial matrix values
     numValues = np.zeros(config.grid_dims)
     numValues.fill(0.3)
-	
+
     forestl, forestr = 60, 30
     canl, canr = 10, 64
     townl, townr = 98, 0
-	
-	numValues[forestl:forestl+20, forestr:forestr+22] = 0.1
-	numValues[canl:canl+60, canr:canr+6] = 0.5
-	
-    #decaygrid[forestl:forestl+20, forestr:forestr+22] = 4           # fill square with state 1 
-    #decaygrid[canl:canl+60, canr:canr+6] = 1
-    
+
+    numValues[forestl:forestl+20, forestr:forestr+22] = 0.1
+    numValues[canl:canl+60, canr:canr+6] = 0.5
+
+    decaygrid[forestl:forestl+20, forestr:forestr+22] = 4           # fill square with state 1
+    decaygrid[canl:canl+60, canr:canr+6] = 1
+
     grid = Grid2D(config, (transition_func, decaygrid))
 
     # Run the CA, save grid state every generation to timeline

@@ -73,18 +73,25 @@ def setup(args):
 
     config.state_colors = [(1,1,0),(0,1,0),(0.752,0.752,0.752),(0,0,1),(0,0,0),(1,0,0), (1, 1, 1)]
     # config.num_generations = 150
-    config.grid_dims = (50,50)
+    config.grid_dims = (100,100)
     config.initial_grid = np.zeros(config.grid_dims)                # zero grid
-    waterl, waterr = 10, 5
-    forestl, forestr = 30, 15
-    canl, canr = 5, 32
-    townl, townr = 49, 0
-    config.initial_grid[forestl:forestl+10, forestr:forestr+11] = 1           # fill square with state 1
-    config.initial_grid[waterl:waterl+4, waterr:waterr+9] = 3
-    config.initial_grid[canl:canl+30, canr:canr+3] = 2
-    config.initial_grid[townl:townl+1, townr:townr+3] = 4
-    config.initial_grid[0,49] = 5
-    config.initial_grid[1,49] = 5
+    waterl, waterr = 20, 10
+    forestl, forestr = 60, 30
+    canl, canr = 10, 64
+    townl, townr = 98, 0
+    config.initial_grid[forestl:forestl+20, forestr:forestr+22] = 1           # fill square with state 1
+    config.initial_grid[waterl:waterl+8, waterr:waterr+18] = 3
+    config.initial_grid[canl:canl+60, canr:canr+6] = 2
+    config.initial_grid[townl:townl+2, townr:townr+6] = 4
+    
+	#incinerator
+    config.initial_grid[0,99] = 5
+    config.initial_grid[1,99] = 5
+	
+	#powerplant
+    #config.initial_grid[0,0] = 5
+    #config.initial_grid[1,0] = 5
+	
 	
     # ----------------------------------------------------------------------
 	
@@ -100,13 +107,22 @@ def main():
     config = setup(sys.argv[1:])
 
     # Create grid object
-    decaygrid = np.zeros(config.grid_dims)
-    decaygrid.fill(2)
-    forestl, forestr = 30, 15
-    canl, canr = 5, 32
-    townl, townr = 49, 0
-    decaygrid[forestl:forestl+10, forestr:forestr+11] = 4           # fill square with state 1 
-    decaygrid[canl:canl+30, canr:canr+3] = 1
+    #decaygrid = np.zeros(config.grid_dims)
+    #decaygrid.fill(2)
+    #create intial matrix values
+    numValues = np.zeros(config.grid_dims)
+    numValues.fill(0.3)
+	
+    forestl, forestr = 60, 30
+    canl, canr = 10, 64
+    townl, townr = 98, 0
+	
+	numValues[forestl:forestl+20, forestr:forestr+22] = 0.1
+	numValues[canl:canl+60, canr:canr+6] = 0.5
+	
+    #decaygrid[forestl:forestl+20, forestr:forestr+22] = 4           # fill square with state 1 
+    #decaygrid[canl:canl+60, canr:canr+6] = 1
+    
     grid = Grid2D(config, (transition_func, decaygrid))
 
     # Run the CA, save grid state every generation to timeline

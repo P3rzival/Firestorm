@@ -27,7 +27,7 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues):
 
     #decayed_to_zero = (decaygrid >= 6)
     #grid[decayed_to_zero] = 6
-	
+
     dead_neighbours = neighbourcounts[5] + neighbourcounts[6] #on fire neighbour count
     wind_direction = 'S'
 
@@ -50,74 +50,111 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues):
     add_one_neighbour = (dead_neighbours == 1) & (grid !=3) & (grid != 6) & (grid != 5)
     add_two_neighbour = (dead_neighbours == 2) & (grid !=3) & (grid != 6) & (grid != 5)
     add_more_neighbour = (dead_neighbours >= 3) & (grid !=3) & (grid != 6) & (grid != 5)
-  
+
     numValues[add_one_neighbour] += 0.01
     numValues[add_two_neighbour] += 0.05
     numValues[add_more_neighbour] += 0.08
- 
+
     # adding up depending on wind and neighboar
-    '''wind_north_n_north = (wind_direction == 'N') & (neighbourstates[7] == 5) & (grid != 5)
-    wind_north_n_east = (wind_direction == 'N') & (neighbourstates[3] == 5) & (grid != 5)
-    wind_north_n_west = (wind_direction == 'N') & (neighbourstates[4] == 5) & (grid != 5)
-    wind_north_n_south = (wind_direction == 'N') & (neighbourstates[1] == 5) & (grid != 5)
-    
-    wind_east_n_north = (wind_direction == 'E') & (neighbourstates[7] == 5) & (grid != 5)
-    wind_east_n_east = (wind_direction == 'E') & (neighbourstates[3] == 5) & (grid != 5)
-    wind_east_n_west = (wind_direction == 'E') & (neighbourstates[4] == 5) & (grid != 5)
-    wind_east_n_south = (wind_direction == 'E') & (neighbourstates[1] == 5) & (grid != 5)
+    wind_north_n_north = (wind_direction == 'N') & (neighbourstates[1] == 5) & (grid != 5)
+    wind_north_n_east = (wind_direction == 'N') & (neighbourstates[4] == 5) & (grid != 5)
+    wind_north_n_west = (wind_direction == 'N') & (neighbourstates[3] == 5) & (grid != 5)
+    wind_north_n_south = (wind_direction == 'N') & (neighbourstates[6] == 5) & (grid != 5)
+    wind_north_n_north_east = (wind_direction == 'N') & (neighbourstates[2] == 5) & (grid != 5)
+    wind_north_n_north_west = (wind_direction == 'N') & (neighbourstates[0] == 5) & (grid != 5)
+    wind_north_n_south_east = (wind_direction == 'N') & (neighbourstates[7] == 5) & (grid != 5)
+    wind_north_n_south_west = (wind_direction == 'N') & (neighbourstates[5] == 5) & (grid != 5)
 
-    wind_west_n_north = (wind_direction == 'W') & (neighbourstates[7] == 5) & (grid != 5)
-    wind_west_n_east = (wind_direction == 'W') & (neighbourstates[3] == 5) & (grid != 5)
-    wind_west_n_west = (wind_direction == 'W') & (neighbourstates[4] == 5) & (grid != 5)
-    wind_west_n_south = (wind_direction == 'W') & (neighbourstates[1] == 5) & (grid != 5)
+    wind_east_n_north = (wind_direction == 'E') & (neighbourstates[1] == 5) & (grid != 5)
+    wind_east_n_east = (wind_direction == 'E') & (neighbourstates[4] == 5) & (grid != 5)
+    wind_east_n_west = (wind_direction == 'E') & (neighbourstates[3] == 5) & (grid != 5)
+    wind_east_n_south = (wind_direction == 'E') & (neighbourstates[6] == 5) & (grid != 5)
+    wind_east_n_north_east = (wind_direction == 'E') & (neighbourstates[2] == 5) & (grid != 5)
+    wind_east_n_north_west = (wind_direction == 'E') & (neighbourstates[0] == 5) & (grid != 5)
+    wind_east_n_south_east = (wind_direction == 'E') & (neighbourstates[7] == 5) & (grid != 5)
+    wind_east_n_south_west = (wind_direction == 'E') & (neighbourstates[5] == 5) & (grid != 5)
 
-    wind_south_n_north = (wind_direction == 'S') & (neighbourstates[7] == 5) & (grid != 5)
-    wind_south_n_east = (wind_direction == 'S') & (neighbourstates[3] == 5) & (grid != 5)
-    wind_south_n_west = (wind_direction == 'S') & (neighbourstates[4] == 5) & (grid != 5)'''
-    wind_south_n_south = (wind_direction == 'S') & (neighbourstates[1] == 5) & (grid != 5)
-    
+    wind_west_n_north = (wind_direction == 'W') & (neighbourstates[1] == 5) & (grid != 5)
+    wind_west_n_east = (wind_direction == 'W') & (neighbourstates[4] == 5) & (grid != 5)
+    wind_west_n_west = (wind_direction == 'W') & (neighbourstates[3] == 5) & (grid != 5)
+    wind_west_n_south = (wind_direction == 'W') & (neighbourstates[6] == 5) & (grid != 5)
+    wind_west_n_north_east = (wind_direction == 'W') & (neighbourstates[2] == 5) & (grid != 5)
+    wind_west_n_north_west = (wind_direction == 'W') & (neighbourstates[0] == 5) & (grid != 5)
+    wind_west_n_south_east = (wind_direction == 'W') & (neighbourstates[7] == 5) & (grid != 5)
+    wind_west_n_south_west = (wind_direction == 'W') & (neighbourstates[5] == 5) & (grid != 5)
+
+    wind_south_n_north = (wind_direction == 'S') & (neighbourstates[1] == 5) & (grid != 5)
+    wind_south_n_east = (wind_direction == 'S') & (neighbourstates[4] == 5) & (grid != 5)
+    wind_south_n_west = (wind_direction == 'S') & (neighbourstates[3] == 5) & (grid != 5)
+    wind_south_n_south = (wind_direction == 'S') & (neighbourstates[6] == 5) & (grid != 5)
+    wind_south_n_north_east = (wind_direction == 'S') & (neighbourstates[2] == 5) & (grid != 5)
+    wind_south_n_north_west = (wind_direction == 'S') & (neighbourstates[0] == 5) & (grid != 5)
+    wind_south_n_south_east = (wind_direction == 'S') & (neighbourstates[7] == 5) & (grid != 5)
+    wind_south_n_south_west = (wind_direction == 'S') & (neighbourstates[5] == 5) & (grid != 5)
+
+
     #Probability of ignition algorithm
-    '''numValues[wind_north_n_north] += 0.05
+    numValues[wind_north_n_north] += 0.1
     numValues[wind_north_n_east] += 0.01
     numValues[wind_north_n_west] += 0.01
-    numValues[wind_north_n_south] += 0.01
-    numValues[wind_east_n_north] += 0.1
+    numValues[wind_north_n_south] += -0.05
+    numValues[wind_north_n_north_east] += 0.05
+    numValues[wind_north_n_north_west] += 0.05
+    numValues[wind_north_n_south_east] += -0.01
+    numValues[wind_north_n_south_west] += -0.01
+
+    numValues[wind_east_n_north] += 0.01
     numValues[wind_east_n_east] += 0.1
-    numValues[wind_east_n_west] += 0.1
-    numValues[wind_east_n_south] += 0.1
-    numValues[wind_west_n_north] += 0.1
-    numValues[wind_west_n_east] += 0.1
+    numValues[wind_east_n_west] += -0.05
+    numValues[wind_east_n_south] += 0.01
+    numValues[wind_east_n_north_east] += 0.05
+    numValues[wind_east_n_north_west] += -0.01
+    numValues[wind_east_n_south_east] += 0.05
+    numValues[wind_east_n_south_west] += -0.01
+
+    numValues[wind_west_n_north] += 0.01
+    numValues[wind_west_n_east] += -0.05
     numValues[wind_west_n_west] += 0.1
-    numValues[wind_west_n_south] += 0.1
-    numValues[wind_south_n_north] += 0.1
-    numValues[wind_south_n_east] += 0.1
-    numValues[wind_south_n_west] += 0.1'''
-    numValues[wind_south_n_south] += 0.05
+    numValues[wind_west_n_south] += 0.01
+    numValues[wind_west_n_north_east] += -0.01
+    numValues[wind_west_n_north_west] += 0.05
+    numValues[wind_west_n_south_east] += -0.01
+    numValues[wind_west_n_south_west] += 0.05
+
+    numValues[wind_south_n_north] += -0.05
+    numValues[wind_south_n_east] += 0.01
+    numValues[wind_south_n_west] += 0.01
+    numValues[wind_south_n_south] += 0.1
+    numValues[wind_south_n_north_east] += -0.01
+    numValues[wind_south_n_north_west] += -0.01
+    numValues[wind_south_n_south_east] += 0.05
+    numValues[wind_south_n_south_west] += 0.05
     
+
 	# Checking values and setting states
     chap_cells = (grid == 0)
     forest_cells = (grid == 1)
     can_cells = (grid == 2)
     on_fire = (grid == 5)
-    
+
     switch_chap_to_fire = (dead_neighbours>0) & (numValues >= chapFireThreshold) & (grid == 0)
     switch_forest_to_fire = (dead_neighbours>0) & (numValues >= forFireThreshold)& (grid == 1)
     switch_can_to_fire = (dead_neighbours>0) & (numValues >= canFireThreshold)& (grid == 2)
-    
+
     switch_chap_to_burnt = (dead_neighbours>0) & (numValues <= 0) & (grid==5)
     switch_forest_to_burnt = (dead_neighbours>0) & (numValues <= 0)& (grid==5)
     switch_can_to_burnt = (dead_neighbours>0) & (numValues <= 0)& (grid==5)
-    
+
     chap_random = np.random.random_integers(24, 96, (100,100))
     can_random = np.random.random_integers(6, 18, (100,100))
     forest_random = np.random.random_integers(240, 1440, (100,100))
-	
+
     numValues[switch_chap_to_fire] = chap_random[switch_chap_to_fire]
     numValues[switch_can_to_fire] = can_random[switch_can_to_fire]
     numValues[switch_forest_to_fire] = forest_random[switch_forest_to_fire]
-   
+
     numValues[on_fire] -= 1
-    
+
     grid[switch_chap_to_fire] = 5
     grid[switch_forest_to_fire] = 5
     grid[switch_can_to_fire] = 5
@@ -125,7 +162,7 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues):
     grid[switch_chap_to_burnt] = 6
     grid[switch_forest_to_burnt] = 6
     grid[switch_can_to_burnt] = 6
-    
+
     #SET TO BURNING
     #decaygrid[chaparralFire] -= 1
 

@@ -146,7 +146,7 @@ def setup(args):
     # ---- Override the defaults below (these may be changed at anytime) ----
 
     config.state_colors = [(1,1,0),(0,1,0),(0.752,0.752,0.752),(0,0,1),(0,0,0),(1,0,0), (1, 1, 1)]
-    # config.num_generations = 150
+    config.num_generations = 1950
     config.grid_dims = (100,100)
     config.initial_grid = np.zeros(config.grid_dims)                # zero grid
     waterl, waterr = 20, 10

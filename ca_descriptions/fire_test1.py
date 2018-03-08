@@ -4,6 +4,9 @@
 # --- Set up executable path, do not edit ---
 import sys
 import inspect
+import logging
+import random
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 this_file_loc = (inspect.stack()[0][1])
 main_dir_loc = this_file_loc[:this_file_loc.index('ca_descriptions')]
 sys.path.append(main_dir_loc)
@@ -16,16 +19,16 @@ from capyle.ca import Grid2D, Neighbourhood, CAConfig, randomise2d
 import capyle.utils as utils
 import numpy as np
 
-
 def transition_func(grid, neighbourstates, neighbourcounts, numValues):
     #SET TO BURNT OUT
     #cells_in_state_5 = (grid == 5)
     #decaygrid[cells_in_state_5] += 2
+    global first_time
 
     #decayed_to_zero = (decaygrid >= 6)
     #grid[decayed_to_zero] = 6
-
-    dead_neighbours = neighbourcounts[5] #on fire neighbour count
+	
+    dead_neighbours = neighbourcounts[5] + neighbourcounts[6] #on fire neighbour count
     wind_direction = 'N'
 
     #chaparralFire = (dead_neighbours >= 2) & (grid !=3) & (grid != 6)
@@ -35,48 +38,49 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues):
     # unpack state counts for state 0 and state 1
 
     # Setting threslhods up
-    chapFireThreshold = 0.4
-    canFireThreshold = 0.4
-    forFireThreshold = 0.6
+    chapFireThreshold = 0.5
+    canFireThreshold = 1.4
+    forFireThreshold = 3
 
-    chapBurntThreshold = 0.4
-    canBurntThreshold = 0.4
-    forBurntThreshold = 0.6
+    chapBurntThreshold = random.randint(24, 96)
+    canBurntThreshold = random.randint(3, 12)
+    forBurntThreshold = random.randint(240, 1440)
 
     # adding up depending on burning neighboars
-    add_one_neighbour = (dead_neighbours == 1) & (grid !=3) & (grid != 6)
-    add_two_neighbour = (dead_neighbours == 2) & (grid !=3) & (grid != 6)
-    add_more_neighbour = (dead_neighbours >= 3) & (grid !=3) & (grid != 6)
-
-    numValues[add_one_neighbour] += 0.1
-    numValues[add_two_neighbour] += 0.3
-    numValues[add_more_neighbour] += 0.5
-
+    add_one_neighbour = (dead_neighbours == 1) & (grid !=3) & (grid != 6) & (grid != 5)
+    add_two_neighbour = (dead_neighbours == 2) & (grid !=3) & (grid != 6) & (grid != 5)
+    add_more_neighbour = (dead_neighbours >= 3) & (grid !=3) & (grid != 6) & (grid != 5)
+  
+    numValues[add_one_neighbour] += 0.01
+    numValues[add_two_neighbour] += 0.05
+    numValues[add_more_neighbour] += 0.08
+ 
     # adding up depending on wind and neighboar
-    wind_north_n_north = (wind_direction == 'N') & (neighbourstates[0] == 5)
-    wind_north_n_east = (wind_direction == 'N') & (neighbourstates[4] == 5)
-    wind_north_n_west = (wind_direction == 'N') & (neighbourstates[3] == 5)
-    wind_north_n_south = (wind_direction == 'N') & (neighbourstates[6] == 5)
+    wind_north_n_north = (wind_direction == 'N') & (neighbourstates[0] == 5) & (grid != 5)
+    '''wind_north_n_east = (wind_direction == 'N') & (neighbourstates[4] == 5) & (grid != 5)
+    wind_north_n_west = (wind_direction == 'N') & (neighbourstates[3] == 5) & (grid != 5)
+    wind_north_n_south = (wind_direction == 'N') & (neighbourstates[6] == 5) & (grid != 5)
     
-    wind_east_n_north = (wind_direction == 'E') & (neighbourstates[0] == 5)
-    wind_east_n_east = (wind_direction == 'E') & (neighbourstates[4] == 5)
-    wind_east_n_west = (wind_direction == 'E') & (neighbourstates[3] == 5)
-    wind_east_n_south = (wind_direction == 'E') & (neighbourstates[6] == 5)
+    wind_east_n_north = (wind_direction == 'E') & (neighbourstates[0] == 5) & (grid != 5)
+    wind_east_n_east = (wind_direction == 'E') & (neighbourstates[4] == 5) & (grid != 5)
+    wind_east_n_west = (wind_direction == 'E') & (neighbourstates[3] == 5) & (grid != 5)
+    wind_east_n_south = (wind_direction == 'E') & (neighbourstates[6] == 5) & (grid != 5)
 
-    wind_west_n_north = (wind_direction == 'W') & (neighbourstates[0] == 5)
-    wind_west_n_east = (wind_direction == 'W') & (neighbourstates[4] == 5)
-    wind_west_n_west = (wind_direction == 'W') & (neighbourstates[3] == 5)
-    wind_west_n_south = (wind_direction == 'W') & (neighbourstates[6] == 5)
+    wind_west_n_north = (wind_direction == 'W') & (neighbourstates[0] == 5) & (grid != 5)
+    wind_west_n_east = (wind_direction == 'W') & (neighbourstates[4] == 5) & (grid != 5)
+    wind_west_n_west = (wind_direction == 'W') & (neighbourstates[3] == 5) & (grid != 5)
+    wind_west_n_south = (wind_direction == 'W') & (neighbourstates[6] == 5) & (grid != 5)
 
-    wind_south_n_north = (wind_direction == 'S') & (neighbourstates[0] == 5)
-    wind_south_n_east = (wind_direction == 'S') & (neighbourstates[4] == 5)
-    wind_south_n_west = (wind_direction == 'S') & (neighbourstates[3] == 5)
-    wind_south_n_south = (wind_direction == 'S') & (neighbourstates[6] == 5)
-
-    numValues[wind_north_n_north] += 0.1
-    numValues[wind_north_n_east] += 0.1
-    numValues[wind_north_n_west] += 0.1
-    numValues[wind_north_n_south] += 0.1
+    wind_south_n_north = (wind_direction == 'S') & (neighbourstates[0] == 5) & (grid != 5)
+    wind_south_n_east = (wind_direction == 'S') & (neighbourstates[4] == 5) & (grid != 5)
+    wind_south_n_west = (wind_direction == 'S') & (neighbourstates[3] == 5) & (grid != 5)
+    wind_south_n_south = (wind_direction == 'S') & (neighbourstates[6] == 5) & (grid != 5)
+    '''
+    #Probability of ignition algorithm
+    numValues[wind_north_n_north] += 0.05
+    '''numValues[wind_north_n_east] += 0.01
+    numValues[wind_north_n_west] += 0.01
+    numValues[wind_north_n_south] += 0.01
     numValues[wind_east_n_north] += 0.1
     numValues[wind_east_n_east] += 0.1
     numValues[wind_east_n_west] += 0.1
@@ -89,20 +93,31 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues):
     numValues[wind_south_n_east] += 0.1
     numValues[wind_south_n_west] += 0.1
     numValues[wind_south_n_south] += 0.1
-
-    # Checking values and setting states
+    '''
+	# Checking values and setting states
     chap_cells = (grid == 0)
     forest_cells = (grid == 1)
     can_cells = (grid == 2)
-
-    switch_chap_to_fire = (numValues[chap_cells] > chapFireThreshold)
-    switch_forest_to_fire = (numValues[forest_cells] > forFireThreshold)
-    switch_can_to_fire = (numValues[can_cells] > canFireThreshold)
-
-    switch_chap_to_burnt = (numValues[chap_cells] > chapBurntThreshold)
-    switch_forest_to_burnt = (numValues[forest_cells] > forBurntThreshold)
-    switch_can_to_burnt = (numValues[can_cells] > canBurntThreshold)
-
+    on_fire = (grid == 5)
+    
+    switch_chap_to_fire = (dead_neighbours>0) & (numValues >= chapFireThreshold) & (grid == 0)
+    switch_forest_to_fire = (dead_neighbours>0) & (numValues >= forFireThreshold)& (grid == 1)
+    switch_can_to_fire = (dead_neighbours>0) & (numValues >= canFireThreshold)& (grid == 2)
+    
+    switch_chap_to_burnt = (dead_neighbours>0) & (numValues <= 0) & (grid==5)
+    switch_forest_to_burnt = (dead_neighbours>0) & (numValues <= 0)& (grid==5)
+    switch_can_to_burnt = (dead_neighbours>0) & (numValues <= 0)& (grid==5)
+    
+    chap_random = np.random.random_integers(24, 96, (100,100))
+    can_random = np.random.random_integers(6, 18, (100,100))
+    forest_random = np.random.random_integers(240, 1440, (100,100))
+	
+    numValues[switch_chap_to_fire] = chap_random[switch_chap_to_fire]
+    numValues[switch_can_to_fire] = can_random[switch_can_to_fire]
+    numValues[switch_forest_to_fire] = forest_random[switch_forest_to_fire]
+   
+    numValues[on_fire] -= 1
+    
     grid[switch_chap_to_fire] = 5
     grid[switch_forest_to_fire] = 5
     grid[switch_can_to_fire] = 5
@@ -110,7 +125,7 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues):
     grid[switch_chap_to_burnt] = 6
     grid[switch_forest_to_burnt] = 6
     grid[switch_can_to_burnt] = 6
-
+    
     #SET TO BURNING
     #decaygrid[chaparralFire] -= 1
 
@@ -118,7 +133,6 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues):
     #grid[decayed_to_zero2] = 5
 
     return grid
-
 
 def setup(args):
     config_path = args[0]
@@ -161,7 +175,7 @@ def setup(args):
 
     return config
 
-
+first_time = True
 def main():
     # Open the config object
     config = setup(sys.argv[1:])
@@ -176,9 +190,9 @@ def main():
     # setting base numbers
     forestl, forestr = 60, 30
     canl, canr = 10, 64
-    numValues.fill(0.3)
-    numValues[forestl:forestl+20, forestr:forestr+22] = 0.1
-    numValues[canl:canl+60, canr:canr+6] = 0.5
+    numValues.fill(0.2)
+    numValues[forestl:forestl+20, forestr:forestr+22] = 2.1
+    numValues[canl:canl+60, canr:canr+6] = 1.4
 
     #decaygrid[forestl:forestl+20, forestr:forestr+22] = 4           # fill square with state 1
     #decaygrid[canl:canl+60, canr:canr+6] = 1

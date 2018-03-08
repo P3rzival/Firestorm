@@ -1,0 +1,4 @@
+#ignore everything
+*
+#except the forest fire files
+!/ca_descriptions/fire_test1.py

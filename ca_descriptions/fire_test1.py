@@ -19,25 +19,25 @@ from capyle.ca import Grid2D, Neighbourhood, CAConfig, randomise2d
 import capyle.utils as utils
 import numpy as np
 
-def transition_func(grid, neighbourstates, neighbourcounts, numValues):
-    #SET TO BURNT OUT
-    #cells_in_state_5 = (grid == 5)
-    #decaygrid[cells_in_state_5] += 2
+def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop):
+    
     global first_time
-
-    #decayed_to_zero = (decaygrid >= 6)
-    #grid[decayed_to_zero] = 6
-
-    dead_neighbours = neighbourcounts[5] + neighbourcounts[6] #on fire neighbour count
     wind_direction = 'S'
 
-    #chaparralFire = (dead_neighbours >= 2) & (grid !=3) & (grid != 6)
+    #Find cells specified for a water drop, and if correct no of iterations have occured swap them to water
+    cellsReadyForWater = (waterDrop == 0)
+    grid[cellsReadyForWater] = 3
 
-    # dead = state == 0, live = state == 1
+    waterDrop += -1
+
+    #on fire neighbour count
+    dead_neighbours = neighbourcounts[5] + neighbourcounts[6]
+
+
 	# Chaparral = state == 0, forest = state == 1, canyon = state == 2, lake = state == 3, town = state == 4
-    # unpack state counts for state 0 and state 1
+    # fire = state == 5, burnt = state == 6
 
-    # Setting threslhods up
+    # Setting thresholds up
     chapFireThreshold = 0.5
     canFireThreshold = 1.4
     forFireThreshold = 3
@@ -163,12 +163,6 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues):
     grid[switch_forest_to_burnt] = 6
     grid[switch_can_to_burnt] = 6
 
-    #SET TO BURNING
-    #decaygrid[chaparralFire] -= 1
-
-    #decayed_to_zero2 = (decaygrid == 0)
-    #grid[decayed_to_zero2] = 5
-
     return grid
 
 def setup(args):
@@ -217,10 +211,6 @@ def main():
     # Open the config object
     config = setup(sys.argv[1:])
 
-    # Create grid object
-    #decaygrid = np.zeros(config.grid_dims)
-    #decaygrid.fill(2)
-
     #create intial matrix values
     numValues = np.zeros(config.grid_dims)
 
@@ -231,10 +221,14 @@ def main():
     numValues[forestl:forestl+20, forestr:forestr+22] = 2.1
     numValues[canl:canl+60, canr:canr+6] = 1.4
 
-    #decaygrid[forestl:forestl+20, forestr:forestr+22] = 4           # fill square with state 1
-    #decaygrid[canl:canl+60, canr:canr+6] = 1
+    #Creating the water drop matrix
+    waterDrop = np.zeros(config.grid_dims)
+    waterDrop.fill(-1)
 
-    grid = Grid2D(config, (transition_func, numValues))
+    #specify the location and time of the water drop
+    waterDrop[forestl:forestl+20, forestr:forestr+22] = 400
+
+    grid = Grid2D(config, (transition_func, numValues, waterDrop))
 
     # Run the CA, save grid state every generation to timeline
     timeline = grid.run()

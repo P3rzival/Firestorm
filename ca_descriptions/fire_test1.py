@@ -19,14 +19,22 @@ from capyle.ca import Grid2D, Neighbourhood, CAConfig, randomise2d
 import capyle.utils as utils
 import numpy as np
 
-def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop):
+def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop, initNumValues):
     
     global first_time
-    wind_direction = 'S'
+    wind_direction = 'N'
 
     #Find cells specified for a water drop, and if correct no of iterations have occured swap them to water
     cellsReadyForWater = (waterDrop == 0)
-    grid[cellsReadyForWater] = 3
+	
+    wetChap = (waterDrop == 0) & (grid != 6) & (initNumValues == 0)
+    wetForest = (waterDrop == 0) & (grid != 6) & (initNumValues == 1)
+    wetCan = (waterDrop == 0) &(grid != 6) & (initNumValues == 2)
+	
+    numValues[wetChap] = 500
+    numValues[wetForest] = 1000
+    numValues[wetCan] = 300
+	
 
     waterDrop += -1
 
@@ -36,6 +44,7 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop
 
 	# Chaparral = state == 0, forest = state == 1, canyon = state == 2, lake = state == 3, town = state == 4
     # fire = state == 5, burnt = state == 6
+    # wet chap = 7, wet forest = 8, wet canyon = 9
 
     # Setting thresholds up
     chapFireThreshold = 0.5
@@ -137,13 +146,20 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop
     can_cells = (grid == 2)
     on_fire = (grid == 5)
 
-    switch_chap_to_fire = (dead_neighbours>0) & (numValues >= chapFireThreshold) & (grid == 0)
-    switch_forest_to_fire = (dead_neighbours>0) & (numValues >= forFireThreshold)& (grid == 1)
-    switch_can_to_fire = (dead_neighbours>0) & (numValues >= canFireThreshold)& (grid == 2)
+    switch_chap_to_fire = (dead_neighbours>0) & (numValues >= chapFireThreshold) & (numValues <= chapFireThreshold+10) & (grid == 0)
+    switch_forest_to_fire = (dead_neighbours>0) & (numValues >= forFireThreshold)& (numValues <= forFireThreshold+10) & (grid == 1)
+    switch_can_to_fire = (dead_neighbours>0) & (numValues >= canFireThreshold) & (numValues <= canFireThreshold+10) & (grid == 2)
 
     switch_chap_to_burnt = (dead_neighbours>0) & (numValues <= 0) & (grid==5)
     switch_forest_to_burnt = (dead_neighbours>0) & (numValues <= 0)& (grid==5)
     switch_can_to_burnt = (dead_neighbours>0) & (numValues <= 0)& (grid==5)
+	
+    switch_chap_to_wet = (numValues >= 400) & (initNumValues == 0)
+    switch_chap_to_not_wet = (numValues == 390) & (initNumValues == 0)
+    switch_forest_to_wet = (numValues >= 900) & (initNumValues == 1)
+    switch_forest_to_not_wet = (numValues == 880) & (initNumValues == 1)
+    switch_can_to_wet = (numValues >= 250) & (initNumValues == 2)
+    switch_can_to_not_wet = (numValues == 245) & (initNumValues == 2)
 
     chap_random = np.random.random_integers(24, 96, (100,100))
     can_random = np.random.random_integers(6, 18, (100,100))
@@ -162,6 +178,13 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop
     grid[switch_chap_to_burnt] = 6
     grid[switch_forest_to_burnt] = 6
     grid[switch_can_to_burnt] = 6
+	
+    grid[switch_chap_to_wet] = 0
+    numValues[switch_chap_to_not_wet] = 0.2
+    grid[switch_forest_to_wet] = 2
+    numValues[switch_forest_to_not_wet] = 2.1
+    grid[switch_can_to_wet] = 1
+    numValues[switch_can_to_not_wet] = 1.4
 
     return grid
 
@@ -171,32 +194,18 @@ def setup(args):
     # ---THE CA MUST BE RELOADED IN THE GUI IF ANY OF THE BELOW ARE CHANGED---
     config.title = "FireStorm"
     config.dimensions = 2
-    config.states = (0, 1, 2, 3, 4, 5, 6)
+    config.states = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
     # ------------------------------------------------------------------------
 
     # ---- Override the defaults below (these may be changed at anytime) ----
 
-    config.state_colors = [(1,1,0),(0,1,0),(0.752,0.752,0.752),(0,0,1),(0,0,0),(1,0,0), (1, 1, 1)]
-    config.num_generations = 1950
+    config.state_colors = [(1,1,0),(0,1,0),(0.752,0.752,0.752),(0,0,1),(0,0,0),(1,0,0), (1, 1, 1), (0.874, 0.615, 0.027), (0.137, 0.325, 0.227), (0.4, 0.4, 0.4)]
     config.grid_dims = (100,100)
-    config.initial_grid = np.zeros(config.grid_dims)                # zero grid
-    waterl, waterr = 20, 10
-    forestl, forestr = 60, 30
-    canl, canr = 10, 64
-    townl, townr = 98, 0
-    config.initial_grid[forestl:forestl+20, forestr:forestr+22] = 1           # fill square with state 1
-    config.initial_grid[waterl:waterl+8, waterr:waterr+18] = 3
-    config.initial_grid[canl:canl+60, canr:canr+6] = 2
-    config.initial_grid[townl:townl+2, townr:townr+6] = 4
+    
 
 	#incinerator
     #config.initial_grid[0,99] = 5
     #config.initial_grid[1,99] = 5
-
-	#powerplant
-    config.initial_grid[0,0] = 5
-    config.initial_grid[1,0] = 5
-
 
     # ----------------------------------------------------------------------
 
@@ -213,6 +222,7 @@ def main():
 
     #create intial matrix values
     numValues = np.zeros(config.grid_dims)
+    initNumValues = np.zeros(config.grid_dims)
 
     # setting base numbers
     forestl, forestr = 60, 30
@@ -220,15 +230,16 @@ def main():
     numValues.fill(0.2)
     numValues[forestl:forestl+20, forestr:forestr+22] = 2.1
     numValues[canl:canl+60, canr:canr+6] = 1.4
-
+    initNumValues = numValues
+	
     #Creating the water drop matrix
     waterDrop = np.zeros(config.grid_dims)
     waterDrop.fill(-1)
 
     #specify the location and time of the water drop
-    waterDrop[forestl:forestl+20, forestr:forestr+22] = 400
+    waterDrop[forestl:forestl+20, forestr:forestr+22] = 150
 
-    grid = Grid2D(config, (transition_func, numValues, waterDrop))
+    grid = Grid2D(config, (transition_func, numValues, waterDrop, initNumValues))
 
     # Run the CA, save grid state every generation to timeline
     timeline = grid.run()

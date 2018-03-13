@@ -59,47 +59,47 @@ def wind(wind_direction, numValues, neighbourstates, grid):
 
 
     #Probability of ignition algorithm
-    dir_wind_random = np.random.uniform(0.08, 0.15, (100,100))
-    non_dir_wind_random = np.random.uniform(-0.15, -0.08, (100,100))
-    side_wind_random = np.random.uniform(0.01, 0.05, (100,100))
-    dir_side_wind_random= np.random.uniform(0.01, 0.05, (100,100))
-    non_dir_side_wind_random = np.random.uniform(0.01, 0.05, (100,100))
+    dir_wind_random = np.random.uniform(0.1, 0.15, (100,100))
+    non_dir_wind_random = np.random.uniform(-0.05, -0.01, (100,100))
+    side_wind_random = np.random.uniform(0.05, 0.08, (100,100))
+    dir_side_wind_random = np.random.uniform(0.05, 0.08, (100,100))
+    non_dir_side_wind_random = np.random.uniform(-0.05, -0.01, (100,100))
 	
-    numValues[wind_north_n_north] += 0.1
-    numValues[wind_north_n_east] += 0.01
-    numValues[wind_north_n_west] += 0.01
-    numValues[wind_north_n_south] += -0.05
-    numValues[wind_north_n_north_east] += 0.05
-    numValues[wind_north_n_north_west] += 0.05
-    numValues[wind_north_n_south_east] += -0.01
-    numValues[wind_north_n_south_west] += -0.01
+    numValues[wind_north_n_north] += dir_wind_random[wind_north_n_north]
+    numValues[wind_north_n_east] += side_wind_random[wind_north_n_east]
+    numValues[wind_north_n_west] += side_wind_random[wind_north_n_west]
+    numValues[wind_north_n_south] += non_dir_wind_random[wind_north_n_south]
+    numValues[wind_north_n_north_east] += dir_side_wind_random[wind_north_n_north_east]
+    numValues[wind_north_n_north_west] += dir_side_wind_random[wind_north_n_north_west]
+    numValues[wind_north_n_south_east] += non_dir_side_wind_random[wind_north_n_south_east]
+    numValues[wind_north_n_south_west] += non_dir_side_wind_random[wind_north_n_south_west]
 
-    numValues[wind_east_n_north] += 0.01
-    numValues[wind_east_n_east] += 0.1
-    numValues[wind_east_n_west] += -0.05
-    numValues[wind_east_n_south] += 0.01
-    numValues[wind_east_n_north_east] += 0.05
-    numValues[wind_east_n_north_west] += -0.01
-    numValues[wind_east_n_south_east] += 0.05
-    numValues[wind_east_n_south_west] += -0.01
+    numValues[wind_east_n_north]      += side_wind_random[wind_east_n_north]
+    numValues[wind_east_n_east]       += dir_wind_random[wind_east_n_east]
+    numValues[wind_east_n_west]       += non_dir_wind_random[wind_east_n_west]
+    numValues[wind_east_n_south]      += side_wind_random[wind_east_n_south]
+    numValues[wind_east_n_north_east] += dir_side_wind_random[wind_east_n_north_east]
+    numValues[wind_east_n_north_west] += non_dir_side_wind_random[wind_east_n_north_west]
+    numValues[wind_east_n_south_east] += dir_side_wind_random[wind_east_n_south_east]
+    numValues[wind_east_n_south_west] += non_dir_side_wind_random[wind_east_n_south_west]
 
-    numValues[wind_west_n_north] += 0.01
-    numValues[wind_west_n_east] += -0.05
-    numValues[wind_west_n_west] += 0.1
-    numValues[wind_west_n_south] += 0.01
-    numValues[wind_west_n_north_east] += -0.01
-    numValues[wind_west_n_north_west] += 0.05
-    numValues[wind_west_n_south_east] += -0.01
-    numValues[wind_west_n_south_west] += 0.05
+    numValues[wind_west_n_north] += side_wind_random[wind_west_n_north]
+    numValues[wind_west_n_east] += non_dir_wind_random[wind_west_n_east]
+    numValues[wind_west_n_west] += dir_wind_random[wind_west_n_west]
+    numValues[wind_west_n_south] += side_wind_random[wind_west_n_south]
+    numValues[wind_west_n_north_east] += non_dir_side_wind_random[wind_west_n_north_east]
+    numValues[wind_west_n_north_west] += dir_side_wind_random[wind_west_n_north_east]
+    numValues[wind_west_n_south_east] += non_dir_side_wind_random[wind_west_n_south_east]
+    numValues[wind_west_n_south_west] += dir_side_wind_random[wind_west_n_south_west]
 
-    numValues[wind_south_n_north] += -0.05
-    numValues[wind_south_n_east] += 0.01
-    numValues[wind_south_n_west] += 0.01
-    numValues[wind_south_n_south] += 0.1
-    numValues[wind_south_n_north_east] += -0.01
-    numValues[wind_south_n_north_west] += -0.01
-    numValues[wind_south_n_south_east] += 0.05
-    numValues[wind_south_n_south_west] += 0.05
+    numValues[wind_south_n_north] += non_dir_wind_random[wind_south_n_north]
+    numValues[wind_south_n_east] += side_wind_random[wind_south_n_east]
+    numValues[wind_south_n_west] += side_wind_random[wind_south_n_west]
+    numValues[wind_south_n_south] += dir_wind_random[wind_south_n_south]
+    numValues[wind_south_n_north_east] += non_dir_side_wind_random[wind_south_n_north_east]
+    numValues[wind_south_n_north_west] += non_dir_side_wind_random[wind_south_n_north_west]
+    numValues[wind_south_n_south_east] += dir_side_wind_random[wind_south_n_south_east]
+    numValues[wind_south_n_south_west] += dir_side_wind_random[wind_south_n_south_west]
     
     return numValues
 
@@ -145,23 +145,23 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop
     # Setting thresholds up
     chapFireThreshold = 0.5
     canFireThreshold = 1.4
-    forFireThreshold = 3
+    forFireThreshold = 6
 
     # adding up depending on burning neighboars
     add_one_neighbour = (dead_neighbours == 1) & (grid !=3) & (grid != 6) & (grid != 5)
     add_two_neighbour = (dead_neighbours == 2) & (grid !=3) & (grid != 6) & (grid != 5)
     add_more_neighbour = (dead_neighbours >= 3) & (grid !=3) & (grid != 6) & (grid != 5)
 	
-    one_neighbour_random = np.random.uniform(0.005, 0.03, (100,100))
-    two_neighbour_random = np.random.uniform(0.03, 0.07, (100,100))
-    more_neighbour_random = np.random.uniform(0.07, 0.09, (100,100))
+    one_neighbour_random = np.random.uniform(0.01, 0.05, (100,100))
+    two_neighbour_random = np.random.uniform(0.05, 0.07, (100,100))
+    more_neighbour_random = np.random.uniform(0.08, 0.1, (100,100))
 	
-    numValues[add_one_neighbour] = numValues[add_one_neighbour] + one_neighbour_random[add_one_neighbour]
-    numValues[add_two_neighbour] = numValues[add_two_neighbour] + two_neighbour_random[add_two_neighbour]
-    numValues[add_more_neighbour] = numValues[add_more_neighbour] + more_neighbour_random[add_more_neighbour]
+    numValues[add_one_neighbour] += one_neighbour_random[add_one_neighbour]
+    numValues[add_two_neighbour] += two_neighbour_random[add_two_neighbour]
+    numValues[add_more_neighbour] += more_neighbour_random[add_more_neighbour]
 
 	#adding wind into the equation
-    numValues = wind(wind_direction, numValues, neighbourstates, grid)
+    #numValues = wind(wind_direction, numValues, neighbourstates, grid)
     
 	# Checking values and setting states
     chap_cells = (grid == 0)
@@ -254,7 +254,7 @@ def main():
     forestl, forestr = 60, 30
     canl, canr = 10, 64
     numValues.fill(0.2)
-    numValues[forestl:forestl+20, forestr:forestr+22] = 2.1
+    numValues[forestl:forestl+20, forestr:forestr+22] = 1.9
     numValues[canl:canl+60, canr:canr+6] = 1.4
     initNumValues = numValues
 	

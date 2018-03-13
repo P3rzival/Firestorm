@@ -19,51 +19,7 @@ from capyle.ca import Grid2D, Neighbourhood, CAConfig, randomise2d
 import capyle.utils as utils
 import numpy as np
 
-def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop, initNumValues):
-    
-    global first_time
-    wind_direction = 'N'
-
-    #Find cells specified for a water drop, and if correct no of iterations have occured swap them to water
-    cellsReadyForWater = (waterDrop == 0)
-	
-    wetChap = (waterDrop == 0) & (grid != 6) & (initNumValues == 0)
-    wetForest = (waterDrop == 0) & (grid != 6) & (initNumValues == 1)
-    wetCan = (waterDrop == 0) &(grid != 6) & (initNumValues == 2)
-	
-    numValues[wetChap] = 500
-    numValues[wetForest] = 1000
-    numValues[wetCan] = 300
-	
-
-    waterDrop += -1
-
-    #on fire neighbour count
-    dead_neighbours = neighbourcounts[5] + neighbourcounts[6]
-
-
-	# Chaparral = state == 0, forest = state == 1, canyon = state == 2, lake = state == 3, town = state == 4
-    # fire = state == 5, burnt = state == 6
-    # wet chap = 7, wet forest = 8, wet canyon = 9
-
-    # Setting thresholds up
-    chapFireThreshold = 0.5
-    canFireThreshold = 1.4
-    forFireThreshold = 3
-
-    chapBurntThreshold = random.randint(24, 96)
-    canBurntThreshold = random.randint(3, 12)
-    forBurntThreshold = random.randint(240, 1440)
-
-    # adding up depending on burning neighboars
-    add_one_neighbour = (dead_neighbours == 1) & (grid !=3) & (grid != 6) & (grid != 5)
-    add_two_neighbour = (dead_neighbours == 2) & (grid !=3) & (grid != 6) & (grid != 5)
-    add_more_neighbour = (dead_neighbours >= 3) & (grid !=3) & (grid != 6) & (grid != 5)
-
-    numValues[add_one_neighbour] += 0.01
-    numValues[add_two_neighbour] += 0.05
-    numValues[add_more_neighbour] += 0.08
-
+def wind(wind_direction, numValues, neighbourstates, grid):
     # adding up depending on wind and neighboar
     wind_north_n_north = (wind_direction == 'N') & (neighbourstates[1] == 5) & (grid != 5)
     wind_north_n_east = (wind_direction == 'N') & (neighbourstates[4] == 5) & (grid != 5)
@@ -103,6 +59,12 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop
 
 
     #Probability of ignition algorithm
+    dir_wind_random = np.random.uniform(0.08, 0.15, (100,100))
+    non_dir_wind_random = np.random.uniform(-0.15, -0.08, (100,100))
+    side_wind_random = np.random.uniform(0.01, 0.05, (100,100))
+    dir_side_wind_random= np.random.uniform(0.01, 0.05, (100,100))
+    non_dir_side_wind_random = np.random.uniform(0.01, 0.05, (100,100))
+	
     numValues[wind_north_n_north] += 0.1
     numValues[wind_north_n_east] += 0.01
     numValues[wind_north_n_west] += 0.01
@@ -139,53 +101,117 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop
     numValues[wind_south_n_south_east] += 0.05
     numValues[wind_south_n_south_west] += 0.05
     
+    return numValues
 
+def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop, initNumValues):
+    
+    wind_direction = 'N'
+
+    #Find cells specified for a water drop, and if correct no of iterations have occured swap them to water
+	
+    wetChap = (waterDrop == 0) & (grid !=6)  & (grid != 3) & (initNumValues == 0.2)
+    wetForest = (waterDrop == 0) & (grid !=6) & (grid != 3) & (initNumValues == 2.1)
+    wetCan = (waterDrop == 0) & (grid !=6)  & (grid != 3) & (initNumValues == 1.4)
+	
+    numValues[wetChap] -= 0.5
+    numValues[wetForest] -= 0.2
+    numValues[wetCan] -= 0.4
+
+    grid[wetChap] = 7
+    grid[wetForest] = 8
+    grid[wetCan] = 9
+   
+    wetFireChap = (waterDrop == 0) & (grid == 5) & (initNumValues == 0.2)
+    wetFireForest = (waterDrop == 0) & (grid == 5) & (initNumValues == 2.1)
+    wetFireCan = (waterDrop == 0) & (grid == 5) & (initNumValues == 1.4)
+
+    numValues[wetFireChap] = -0.3
+    numValues[wetFireForest] = 2
+    numValues[wetFireCan] = 1
+    
+    grid[wetFireChap] = 7
+    grid[wetFireForest] = 8
+    grid[wetFireCan] = 9
+   
+    waterDrop -= 1
+	
+	#on fire neighbour count
+    dead_neighbours = neighbourcounts[5] + neighbourcounts[6]
+
+	# Chaparral = state == 0, forest = state == 1, canyon = state == 2, lake = state == 3, town = state == 4
+    # fire = state == 5, burnt = state == 6
+    # wet chap = 7, wet forest = 8, wet canyon = 9
+
+    # Setting thresholds up
+    chapFireThreshold = 0.5
+    canFireThreshold = 1.4
+    forFireThreshold = 3
+
+    # adding up depending on burning neighboars
+    add_one_neighbour = (dead_neighbours == 1) & (grid !=3) & (grid != 6) & (grid != 5)
+    add_two_neighbour = (dead_neighbours == 2) & (grid !=3) & (grid != 6) & (grid != 5)
+    add_more_neighbour = (dead_neighbours >= 3) & (grid !=3) & (grid != 6) & (grid != 5)
+	
+    one_neighbour_random = np.random.uniform(0.005, 0.03, (100,100))
+    two_neighbour_random = np.random.uniform(0.03, 0.07, (100,100))
+    more_neighbour_random = np.random.uniform(0.07, 0.09, (100,100))
+	
+    numValues[add_one_neighbour] = numValues[add_one_neighbour] + one_neighbour_random[add_one_neighbour]
+    numValues[add_two_neighbour] = numValues[add_two_neighbour] + two_neighbour_random[add_two_neighbour]
+    numValues[add_more_neighbour] = numValues[add_more_neighbour] + more_neighbour_random[add_more_neighbour]
+
+	#adding wind into the equation
+    numValues = wind(wind_direction, numValues, neighbourstates, grid)
+    
 	# Checking values and setting states
     chap_cells = (grid == 0)
     forest_cells = (grid == 1)
     can_cells = (grid == 2)
     on_fire = (grid == 5)
+	
+    switch_chap_to_fire = (dead_neighbours>0) & (numValues >= chapFireThreshold) & (grid == 0)
+    switch_forest_to_fire = (dead_neighbours>0) & (numValues >= forFireThreshold) & (grid == 1)
+    switch_can_to_fire = (dead_neighbours>0) & (numValues >= canFireThreshold) & (grid == 2)
 
-    switch_chap_to_fire = (dead_neighbours>0) & (numValues >= chapFireThreshold) & (numValues <= chapFireThreshold+10) & (grid == 0)
-    switch_forest_to_fire = (dead_neighbours>0) & (numValues >= forFireThreshold)& (numValues <= forFireThreshold+10) & (grid == 1)
-    switch_can_to_fire = (dead_neighbours>0) & (numValues >= canFireThreshold) & (numValues <= canFireThreshold+10) & (grid == 2)
-
+    switch_wet_chap_to_fire = (dead_neighbours>0) & (numValues >= forFireThreshold) & (grid == 7)
+    switch_wet_forest_to_fire = (dead_neighbours>0) & (numValues >= forFireThreshold) & (grid == 8)
+    switch_wet_can_to_fire = (dead_neighbours>0) & (numValues >= forFireThreshold) & (grid == 9)
+    
     switch_chap_to_burnt = (dead_neighbours>0) & (numValues <= 0) & (grid==5)
     switch_forest_to_burnt = (dead_neighbours>0) & (numValues <= 0)& (grid==5)
     switch_can_to_burnt = (dead_neighbours>0) & (numValues <= 0)& (grid==5)
 	
-    switch_chap_to_wet = (numValues >= 400) & (initNumValues == 0)
-    switch_chap_to_not_wet = (numValues == 390) & (initNumValues == 0)
-    switch_forest_to_wet = (numValues >= 900) & (initNumValues == 1)
-    switch_forest_to_not_wet = (numValues == 880) & (initNumValues == 1)
-    switch_can_to_wet = (numValues >= 250) & (initNumValues == 2)
-    switch_can_to_not_wet = (numValues == 245) & (initNumValues == 2)
+    itMult = 8
+    itHours = itMult * 24
+	
+    chap_random = np.random.random_integers(itMult * 6, itHours * 5, (100,100))
+    can_random = np.random.random_integers(itMult * 6, itMult * 18, (100,100))
+    forest_random = np.random.random_integers(itHours * 15, itHours * 31, (100,100))
 
-    chap_random = np.random.random_integers(24, 96, (100,100))
-    can_random = np.random.random_integers(6, 18, (100,100))
-    forest_random = np.random.random_integers(240, 1440, (100,100))
-
-    numValues[switch_chap_to_fire] = chap_random[switch_chap_to_fire]
-    numValues[switch_can_to_fire] = can_random[switch_can_to_fire]
-    numValues[switch_forest_to_fire] = forest_random[switch_forest_to_fire]
-
+    numValues[switch_chap_to_fire] += chap_random[switch_chap_to_fire]
+    numValues[switch_can_to_fire] += can_random[switch_can_to_fire]
+    numValues[switch_forest_to_fire] += forest_random[switch_forest_to_fire]
+    
+    numValues[switch_wet_chap_to_fire] += chap_random[switch_wet_chap_to_fire]
+    numValues[switch_wet_forest_to_fire] += forest_random[switch_wet_forest_to_fire]
+    numValues[switch_wet_can_to_fire] += can_random[switch_wet_can_to_fire]
+    
     numValues[on_fire] -= 1
 
     grid[switch_chap_to_fire] = 5
     grid[switch_forest_to_fire] = 5
     grid[switch_can_to_fire] = 5
+	
+    grid[switch_wet_chap_to_fire] = 5
+    grid[switch_wet_forest_to_fire] = 5
+    grid[switch_wet_can_to_fire] = 5
 
     grid[switch_chap_to_burnt] = 6
     grid[switch_forest_to_burnt] = 6
     grid[switch_can_to_burnt] = 6
-	
-    grid[switch_chap_to_wet] = 0
-    numValues[switch_chap_to_not_wet] = 0.2
-    grid[switch_forest_to_wet] = 2
-    numValues[switch_forest_to_not_wet] = 2.1
-    grid[switch_can_to_wet] = 1
-    numValues[switch_can_to_not_wet] = 1.4
 
+    
+	
     return grid
 
 def setup(args):
@@ -235,9 +261,10 @@ def main():
     #Creating the water drop matrix
     waterDrop = np.zeros(config.grid_dims)
     waterDrop.fill(-1)
-
+	
+    reactionTime = 100
     #specify the location and time of the water drop
-    waterDrop[forestl:forestl+20, forestr:forestr+22] = 150
+    waterDrop[0:40, 20] = reactionTime
 
     grid = Grid2D(config, (transition_func, numValues, waterDrop, initNumValues))
 

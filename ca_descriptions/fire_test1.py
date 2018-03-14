@@ -19,6 +19,9 @@ from capyle.ca import Grid2D, Neighbourhood, CAConfig, randomise2d
 import capyle.utils as utils
 import numpy as np
 
+itNumber = 0
+firstTime = True
+
 def wind(wind_direction, numValues, neighbourstates, grid):
     # adding up depending on wind and neighboar
     wind_north_n_north = (wind_direction == 'N') & (neighbourstates[1] == 5) & (grid != 5)
@@ -104,7 +107,9 @@ def wind(wind_direction, numValues, neighbourstates, grid):
     return numValues
 
 def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop, initNumValues):
-    
+    global itNumber
+    global firstTime
+	
     wind_direction = 'N'
 
     #Find cells specified for a water drop, and if correct no of iterations have occured swap them to water
@@ -161,7 +166,7 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop
     numValues[add_more_neighbour] += more_neighbour_random[add_more_neighbour]
 
 	#adding wind into the equation
-    #numValues = wind(wind_direction, numValues, neighbourstates, grid)
+    numValues = wind(wind_direction, numValues, neighbourstates, grid)
     
 	# Checking values and setting states
     chap_cells = (grid == 0)
@@ -210,8 +215,16 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop
     grid[switch_forest_to_burnt] = 6
     grid[switch_can_to_burnt] = 6
 
-    
+    #reaches town
+    fireToTown = (dead_neighbours > 0) & (grid == 4)
+    itNumber += 1
 	
+    if (numValues[fireToTown].any() == -2) & firstTime:
+      print(itNumber)
+      firstTime = False
+    
+    
+	  
     return grid
 
 def setup(args):
@@ -220,18 +233,13 @@ def setup(args):
     # ---THE CA MUST BE RELOADED IN THE GUI IF ANY OF THE BELOW ARE CHANGED---
     config.title = "FireStorm"
     config.dimensions = 2
-    config.states = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+    config.states = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
     # ------------------------------------------------------------------------
 
     # ---- Override the defaults below (these may be changed at anytime) ----
 
-    config.state_colors = [(1,1,0),(0,1,0),(0.752,0.752,0.752),(0,0,1),(0,0,0),(1,0,0), (1, 1, 1), (0.874, 0.615, 0.027), (0.137, 0.325, 0.227), (0.4, 0.4, 0.4)]
+    config.state_colors = [(1,1,0),(0,1,0),(0.752,0.752,0.752),(0,0,1),(0,0,0),(1,0,0), (1, 1, 1), (0.874, 0.615, 0.027), (0.137, 0.325, 0.227), (0.4, 0.4, 0.4), (135/255, 62/255, 59/255)]
     config.grid_dims = (100,100)
-    
-
-	#incinerator
-    #config.initial_grid[0,99] = 5
-    #config.initial_grid[1,99] = 5
 
     # ----------------------------------------------------------------------
 
@@ -253,9 +261,12 @@ def main():
     # setting base numbers
     forestl, forestr = 60, 30
     canl, canr = 10, 64
+    townl, townr = 98, 0
+	
     numValues.fill(0.2)
     numValues[forestl:forestl+20, forestr:forestr+22] = 1.9
     numValues[canl:canl+60, canr:canr+6] = 1.4
+    numValues[townl:townl+2, townr:townr+5] = -2
     initNumValues = numValues
 	
     #Creating the water drop matrix

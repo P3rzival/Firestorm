@@ -53,7 +53,6 @@ class CAConfig(object):
             self.initial_grid[canl:canl+60, canr:canr+6] = 2
             self.initial_grid[townl:townl+2, townr:townr+6] = 4
             self.initial_grid[0,0] = 5
-            self.initial_grid[1,0] = 5
 
         # neighbourhood array
         if self.nhood_arr is None:

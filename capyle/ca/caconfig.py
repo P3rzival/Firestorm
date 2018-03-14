@@ -43,6 +43,16 @@ class CAConfig(object):
             fillstate = self.states[0] if self.states is not None else 0
             self.initial_grid = np.zeros(self.grid_dims, dtype=type(fillstate))
             self.initial_grid.fill(fillstate)
+            waterl, waterr = 20, 10
+            forestl, forestr = 60, 30
+            canl, canr = 10, 64
+            townl, townr = 98, 0
+            self.num_generations = 200
+            self.initial_grid[forestl:forestl+20, forestr:forestr+22] = 1 
+            self.initial_grid[waterl:waterl+8, waterr:waterr+18] = 3
+            self.initial_grid[canl:canl+60, canr:canr+6] = 2
+            self.initial_grid[townl:townl+2, townr:townr+6] = 4
+            self.initial_grid[0,0] = 5
 
         # neighbourhood array
         if self.nhood_arr is None:

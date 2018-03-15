@@ -109,7 +109,6 @@ def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop
     config_path = args[0]
     configF = utils.load(config_path)
 	
-    print(configF.wind_dir)
     wind_direction = configF.wind_dir
 
     #Find cells specified for a water drop, and if correct no of iterations have occured swap them to water

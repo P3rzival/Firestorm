@@ -16,6 +16,7 @@ class CAConfig(object):
         self.rule_num = None
         self.state_colors = None
         self.num_generations = None
+        self.wind_dir = None
         self.nhood_arr = None
         self.initial_grid = None
         # default wrapping behaviour is True
@@ -30,6 +31,10 @@ class CAConfig(object):
         # number of generations
         if self.num_generations is None:
             self.num_generations = 100
+
+        #wind direction
+        if self.wind_dir is None:
+            self.wind_dir = 'N'
 
         # grid dimensions
         if self.grid_dims is None:
@@ -48,6 +53,7 @@ class CAConfig(object):
             canl, canr = 10, 64
             townl, townr = 98, 0
             self.num_generations = 200
+            self.wind_dir = 'S'
             self.initial_grid[forestl:forestl+20, forestr:forestr+22] = 1 
             self.initial_grid[waterl:waterl+8, waterr:waterr+18] = 3
             self.initial_grid[canl:canl+60, canr:canr+6] = 2

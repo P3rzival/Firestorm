@@ -16,6 +16,7 @@ sys.path.append(main_dir_loc + 'capyle/guicomponents')
 # ---
 
 from capyle.ca import Grid2D, Neighbourhood, CAConfig, randomise2d
+from capyle.guicomponents import _ConfigFrame
 import capyle.utils as utils
 import numpy as np
 
@@ -88,7 +89,7 @@ def wind(wind_direction, numValues, neighbourstates, grid):
     numValues[wind_west_n_west]       += dir_wind_random[wind_west_n_west]
     numValues[wind_west_n_south]      += side_wind_random[wind_west_n_south]
     numValues[wind_west_n_north_east] += non_dir_side_wind_random[wind_west_n_north_east]
-    numValues[wind_west_n_north_west] += dir_side_wind_random[wind_west_n_north_east]
+    numValues[wind_west_n_north_west] += dir_side_wind_random[wind_west_n_north_west]
     numValues[wind_west_n_south_east] += non_dir_side_wind_random[wind_west_n_south_east]
     numValues[wind_west_n_south_west] += dir_side_wind_random[wind_west_n_south_west]
 
@@ -104,8 +105,12 @@ def wind(wind_direction, numValues, neighbourstates, grid):
     return numValues
 
 def transition_func(grid, neighbourstates, neighbourcounts, numValues, waterDrop, initNumValues):
+    args = sys.argv[1:]
+    config_path = args[0]
+    configF = utils.load(config_path)
 	
-    wind_direction = 'N'
+    print(configF.wind_dir)
+    wind_direction = configF.wind_dir
 
     #Find cells specified for a water drop, and if correct no of iterations have occured swap them to water
 	
@@ -213,7 +218,6 @@ def setup(args):
 
     config.state_colors = [(1,1,0),(0,1,0),(0.752,0.752,0.752),(0,0,1),(0,0,0),(1,0,0), (1, 1, 1), (0.874, 0.615, 0.027), (0.137, 0.325, 0.227), (0.4, 0.4, 0.4), (135/255, 62/255, 59/255)]
     config.grid_dims = (100,100)
-
     # ----------------------------------------------------------------------
 
     if len(args) == 2:

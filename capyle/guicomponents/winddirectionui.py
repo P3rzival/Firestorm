@@ -10,7 +10,7 @@ class _WindDirectionUI(tk.Frame, _ConfigUIComponent):
         """Create and populate the wind direction ui"""
         tk.Frame.__init__(self, parent)
         _ConfigUIComponent.__init__(self)
-        gen_label = tk.Label(self, text="Wind direction (1 = N, 2 = E, 3 = S, 4 = W):")
+        gen_label = tk.Label(self, text="Wind direction (1 = N, 2 = E, 3 = S, 4 = W, anything else = no wind):")
         gen_label.pack(side=tk.LEFT)
         is_valid_int = (self.register(is_valid_integer), '%P')
         self.gen_entry = tk.Entry(self, validate='key',

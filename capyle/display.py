@@ -107,7 +107,7 @@ class Display(object):
                 l = line.split("=")
                 if l[0] == "logo":
                     logo_on = l[1].strip() == "1"
-        if logo_on:
+        if not logo_on:
             logo = get_logo()
             img = tk.Label(self.lframe, image=logo)
             img.image = logo  # must keep handle
